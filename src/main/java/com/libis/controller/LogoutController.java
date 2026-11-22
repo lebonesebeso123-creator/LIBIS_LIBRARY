@@ -9,22 +9,29 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+/**
+ * Ends the container login and the session, then sends the user to a protected page,
+ * which makes Tomcat show login.jsp again.
+ */
 @WebServlet(name = "LogoutController", urlPatterns = {"/logout"})
 public class LogoutController extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        response.sendRedirect(request.getContextPath() + "/login?loggedOut=true");
-    }
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        request.logout();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        response.sendRedirect(request.getContextPath() + "/catalogue?loggedOut=true");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request, response);
     }
 }

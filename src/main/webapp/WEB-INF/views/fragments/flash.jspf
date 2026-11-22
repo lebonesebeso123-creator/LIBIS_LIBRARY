@@ -1,0 +1,10 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- One-time messages set by a controller before a redirect (Post/Redirect/Get) --%>
+<c:if test="${not empty sessionScope.flash}">
+    <div class="alert alert-success"><c:out value="${sessionScope.flash}"/></div>
+    <c:remove var="flash" scope="session"/>
+</c:if>
+<c:if test="${not empty sessionScope.flashError}">
+    <div class="alert alert-danger"><c:out value="${sessionScope.flashError}"/></div>
+    <c:remove var="flashError" scope="session"/>
+</c:if>

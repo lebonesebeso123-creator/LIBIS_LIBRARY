@@ -1,0 +1,42 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%-- Shared navigation. Hiding links is only for convenience: web.xml is what enforces access.
+     Each page sets ${langPath} (its own controller URL) before including this fragment. --%>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<c:set var="isMember" value="${pageContext.request.isUserInRole('member')}"/>
+<c:set var="isLibrarian" value="${pageContext.request.isUserInRole('librarian')}"/>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background:#1a365d">
+    <div class="container">
+        <a class="navbar-brand" href="${ctx}/catalogue"><fmt:message key="app.name"/></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="${ctx}/catalogue"><fmt:message key="nav.catalogue"/></a></li>
+                <c:if test="${isMember}">
+                    <li class="nav-item"><a class="nav-link" href="${ctx}/loans"><fmt:message key="nav.myLoans"/></a></li>
+                </c:if>
+                <c:if test="${isLibrarian}">
+                    <li class="nav-item"><a class="nav-link" href="${ctx}/librarian/books"><fmt:message key="nav.manageBooks"/></a></li>
+                    <li class="nav-item"><a class="nav-link" href="${ctx}/librarian/members"><fmt:message key="nav.manageMembers"/></a></li>
+                </c:if>
+            </ul>
+            <div class="d-flex align-items-center gap-3 text-light small">
+                <span>
+                    <fmt:message key="lang.label"/>:
+                    <c:url var="enUrl" value="${langPath}"><c:param name="lang" value="en"/></c:url>
+                    <c:url var="tnUrl" value="${langPath}"><c:param name="lang" value="tn"/></c:url>
+                    <a class="link-light" href="${enUrl}"><fmt:message key="lang.en"/></a>
+                    |
+                    <a class="link-light" href="${tnUrl}"><fmt:message key="lang.tn"/></a>
+                </span>
+                <span><fmt:message key="nav.signedInAs"/> <strong><c:out value="${pageContext.request.remoteUser}"/></strong></span>
+                <form method="post" action="${ctx}/logout" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-light"><fmt:message key="nav.logout"/></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,8 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%-- Language switch: ?lang=en or ?lang=tn stores the choice in the SESSION, so it follows
+     the member from the catalogue to My Loans. Only the two supported values are accepted. --%>
+<c:if test="${param.lang == 'en' or param.lang == 'tn'}">
+    <fmt:setLocale value="${param.lang}" scope="session"/>
+</c:if>
+<fmt:setBundle basename="messages"/>

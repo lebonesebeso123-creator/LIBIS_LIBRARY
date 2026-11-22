@@ -3,4 +3,128 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+    <display-name>LIBIS LIBRARY</display-name>
+
+    <!-- UTF-8 everywhere (needed for Setswana and names such as Ngũgĩ) -->
+    <request-character-encoding>UTF-8</request-character-encoding>
+    <response-character-encoding>UTF-8</response-character-encoding>
+
+    <!-- Default JSTL fmt bundle and fallback language -->
+    <context-param>
+        <param-name>jakarta.servlet.jsp.jstl.fmt.localizationContext</param-name>
+        <param-value>messages</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jakarta.servlet.jsp.jstl.fmt.fallbackLocale</param-name>
+        <param-value>en</param-value>
+    </context-param>
+
+    <!-- Views are JSTL/EL only: the container REFUSES to compile any scriptlet -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+            <scripting-invalid>true</scripting-invalid>
+            <trim-directive-whitespaces>true</trim-directive-whitespaces>
+        </jsp-property-group>
+    </jsp-config>
+
+    <!-- The container-managed DataSource declared in META-INF/context.xml -->
+    <resource-ref>
+        <res-ref-name>jdbc/libis</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <!-- ===================== SECURITY (replaces AuthenticationFilter) ===================== -->
+
+    <!-- Any HTTP method not listed in a constraint is denied rather than left open -->
+    <deny-uncovered-http-methods/>
+
+    <!-- Catalogue: both roles -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Catalogue</web-resource-name>
+            <url-pattern>/catalogue</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>member</role-name>
+            <role-name>librarian</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Borrow, return and My Loans: members only -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Loans</web-resource-name>
+            <url-pattern>/loans</url-pattern>
+            <url-pattern>/loans/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>member</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Member and book management: librarians only (a member gets HTTP 403) -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Librarian area</web-resource-name>
+            <url-pattern>/librarian</url-pattern>
+            <url-pattern>/librarian/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>librarian</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>LIBIS</realm-name>
+        <form-login-config>
+            <form-login-page>/login.jsp</form-login-page>
+            <form-error-page>/login-error.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <description>A library member: borrows and returns books</description>
+        <role-name>member</role-name>
+    </security-role>
+    <security-role>
+        <description>A librarian: manages members and books</description>
+        <role-name>librarian</role-name>
+    </security-role>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!-- ===================== FRIENDLY ERROR PAGES (no stack traces) ===================== -->
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>com.libis.exception.DataAccessException</exception-type>
+        <location>/WEB-INF/views/error/database.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+
 </web-app>

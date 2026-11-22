@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tomcat configuration for LIBIS.
+  1. jdbc/libis : container-managed connection pool to the MySQL `libis` schema.
+     The username/password match the libis_app account created at the end of libis.sql.
+  2. DataSourceRealm : Tomcat authenticates FORM logins against OUR members table
+     (username, password, role) through the same DataSource - not tomcat-users.xml.
+  3. FormAuthenticator landingPage : where to go if someone submits the login page directly.
+-->
+<Context>
+
+    <Resource name="jdbc/libis"
+              auth="Container"
+              type="javax.sql.DataSource"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/libis?sslMode=DISABLED&amp;allowPublicKeyRetrieval=true&amp;characterEncoding=UTF-8"
+              username="libis_app"
+              password="LibisApp#2026"
+              maxTotal="20"
+              maxIdle="5"
+              maxWaitMillis="10000"
+              validationQuery="SELECT 1"
+              testOnBorrow="true"/>
+
+    <Realm className="org.apache.catalina.realm.DataSourceRealm"
+           dataSourceName="jdbc/libis"
+           localDataSource="true"
+           userTable="members"
+           userNameCol="username"
+           userCredCol="password"
+           userRoleTable="members"
+           roleNameCol="role"/>
+
+    <Valve className="org.apache.catalina.authenticator.FormAuthenticator"
+           landingPage="/catalogue"/>
+
+</Context>
