@@ -5,7 +5,8 @@ JDBC DAOs on MySQL, Jakarta Security FORM login (DataSourceRealm) and English / 
 
 ## 1. Set up and run
 
-1. **Database.** Open `libis.sql` in MySQL Workbench as `root` and run it (lightning icon), or
+1. **Database.** Easiest: double-click `setup-database.bat` (asks for your MySQL root password, runs
+   `libis.sql` and checks the app account). Or open `libis.sql` in MySQL Workbench as `root` and run it (lightning icon), or
    `mysql -u root -p < libis.sql`. It drops and recreates the `libis` schema, seeds the data and creates the
    application account `libis_app` / `LibisApp#2026` used by `META-INF/context.xml`. Re-run it any time to reset.
 2. **Tomcat 11** (Servlet 6.1). In IntelliJ: *Run > Edit Configurations > + > Tomcat Server > Local*,
