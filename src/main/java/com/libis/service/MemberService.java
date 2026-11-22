@@ -51,6 +51,37 @@ public class MemberService {
     }
 
     /**
+     * Self-registration from the public sign-up page.
+     * The role is ALWAYS member (nobody can make themselves a librarian) and the
+     * member number is assigned automatically.
+     *
+     * @return the new member, with its id and member number filled in
+     */
+    public Member register(Member member, String confirmPassword) throws ValidationException {
+        member.setRole(Role.MEMBER);
+        normalise(member);
+        for (int attempt = 0; attempt < 2; attempt++) {
+            member.setMemberNumber(memberDao.nextMemberNumber());
+            Map<String, String> errors = validate(member, true);
+            if (!errors.containsKey("password") && !isBlank(member.getPassword())
+                    && !member.getPassword().equals(confirmPassword)) {
+                errors.put("confirmPassword", "The two passwords do not match.");
+            }
+            // Someone else took the same number at the same moment: try the next one once more
+            if (errors.size() == 1 && errors.containsKey("memberNumber") && attempt == 0) {
+                continue;
+            }
+            errors.remove("memberNumber");   // not a field on the sign-up form
+            if (!errors.isEmpty()) {
+                throw new ValidationException(errors);
+            }
+            member.setId(memberDao.create(member));
+            return member;
+        }
+        throw new ValidationException("A member number could not be assigned. Please try again.");
+    }
+
+    /**
      * Validates and updates a member. A blank password keeps the existing one.
      * A librarian cannot remove the librarian role from their own account.
      */

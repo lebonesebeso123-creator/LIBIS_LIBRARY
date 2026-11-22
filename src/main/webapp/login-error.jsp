@@ -30,6 +30,9 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">Sign in</button>
     </form>
+    <p class="text-center small mt-3 mb-0">
+        New to LIBIS? <a href="${pageContext.request.contextPath}/register">Create an account</a>
+    </p>
 </div>
 </body>
 </html>

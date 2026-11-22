@@ -47,6 +47,9 @@ public class MemberDaoImpl implements MemberDao {
     private static final String SQL_UPDATE_KEEP_PASSWORD =
             "UPDATE members SET member_number = ?, full_name = ?, email = ?, username = ?,"
             + " role = ? WHERE member_id = ?";
+    private static final String SQL_MAX_NUMBER =
+            "SELECT MAX(CAST(SUBSTRING(member_number, 5) AS UNSIGNED)) FROM members"
+            + " WHERE member_number LIKE ?";
     private static final String SQL_DELETE =
             "DELETE FROM members WHERE member_id = ?";
 
@@ -145,6 +148,20 @@ public class MemberDaoImpl implements MemberDao {
             return ps.executeUpdate() == 1;
         } catch (SQLException e) {
             throw fail("Could not update member", e);
+        }
+    }
+
+    @Override
+    public String nextMemberNumber() {
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(SQL_MAX_NUMBER)) {
+            ps.setString(1, "LIB-%");
+            try (ResultSet rs = ps.executeQuery()) {
+                int max = rs.next() ? rs.getInt(1) : 0;   // 0 when the table is empty
+                return String.format("LIB-%03d", max + 1);
+            }
+        } catch (SQLException e) {
+            throw fail("Could not generate a member number", e);
         }
     }
 

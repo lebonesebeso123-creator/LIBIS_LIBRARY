@@ -29,6 +29,12 @@ public interface MemberDao {
      */
     boolean update(Member member);
 
+    /**
+     * The next free member number in the LIB-nnn series (for self-registration),
+     * e.g. "LIB-101" when the highest existing number is LIB-100.
+     */
+    String nextMemberNumber();
+
     /** Deletes the member; ON DELETE CASCADE removes all their loan rows. */
     boolean delete(int id);
 }

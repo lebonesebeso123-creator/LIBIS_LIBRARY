@@ -30,6 +30,10 @@ Troubleshooting:
 | member | `naledi` | `read2024` | LIB-004 | returned loans only |
 | member | `tshepo` | `books99` | LIB-005 | returned loans only |
 
+New users can also sign up themselves: **Create an account** on the login page (`/register`).
+Self-registered accounts are always `member` (the role cannot be chosen) and get the next member number
+automatically (LIB-101, LIB-102, ...). Only a librarian can create another librarian.
+
 Seeded open loans: *Things Fall Apart, Born a Crime, Sapiens* (Thabo), *Nervous Conditions* (Kea),
 *Half of a Yellow Sun* (Mpho). All other books are available.
 
@@ -53,6 +57,7 @@ Seeded open loans: *Things Fall Apart, Born a Crime, Sapiens* (Thabo), *Nervous 
 | Container DataSource + JNDI helper | `META-INF/context.xml`, `config/DataSourceProvider` |
 | DAOs (interface + impl, PreparedStatement, try-with-resources) | `dao/*Dao`, `dao/*DaoImpl` |
 | Validation and duplicate checks | `service/MemberService`, `service/BookService` |
+| Self-registration (role forced to member, auto member number) | `controller/RegisterController`, `MemberService.register()`, `MemberDao.nextMemberNumber()`, `views/register.jsp` |
 | Borrowing rules, `MAX_LOANS = 3` | `service/LoanService`, `exception/LoanException` |
 | FORM login, 2 roles, constraints, 403 | `WEB-INF/web.xml`, `login.jsp`, `login-error.jsp`, Realm in `context.xml` |
 | Signed-in user from the container | `ControllerSupport.currentMember()` uses `request.getRemoteUser()` |
@@ -71,4 +76,5 @@ Seeded open loans: *Things Fall Apart, Born a Crime, Sapiens* (Thabo), *Nervous 
 | `POST /loans/borrow`, `POST /loans/return` | member | borrow / return (`bookId`) |
 | `/librarian/members[/new, /edit?id=, /delete?id=]` | librarian | member management |
 | `/librarian/books[/new, /edit?id=, /delete?id=]` | librarian | book management |
+| `/register` | anyone (signed out) | create a member account |
 | `/logout` | anyone | ends the session, back to login |
