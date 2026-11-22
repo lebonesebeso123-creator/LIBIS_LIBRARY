@@ -6,8 +6,9 @@ import com.libis.model.Member;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
-public class DataStore {
+public class LibraryData {
 
     private static final List<Member> members = new ArrayList<>();
     private static final List<Book> books = new ArrayList<>();
@@ -62,4 +63,23 @@ public class DataStore {
         }
         return null;
     }
+
+    /** Returns books whose title, author or genre contains the query (case-insensitive). */
+    public static List<Book> searchBooks(String query) {
+        if (query == null || query.isBlank()) {
+            return getBooks();
+        }
+        String q = query.trim().toLowerCase(Locale.ROOT);
+        List<Book> results = new ArrayList<>();
+        for (Book b : books) {
+            if (b.getTitle().toLowerCase(Locale.ROOT).contains(q)
+                    || b.getAuthor().toLowerCase(Locale.ROOT).contains(q)
+                    || b.getGenre().toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(b);
+            }
+        }
+        return results;
+    }
+
+    private LibraryData() { }
 }

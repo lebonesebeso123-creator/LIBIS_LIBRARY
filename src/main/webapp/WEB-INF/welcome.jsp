@@ -1,6 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ page import="com.libis.data.LibraryData" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,25 +67,44 @@
             font-size: 0.9rem;
         }
         .logout:hover { color: white; }
+        .search { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .search input {
+            flex: 1; padding: 11px 13px; border: 1px solid #cbd5e0;
+            border-radius: 8px; font-size: 0.95rem;
+        }
+        .search input:focus { outline: none; border-color: #2b6cb0; }
+        .search button {
+            padding: 11px 20px; background: #2c5282; color: white; border: none;
+            border-radius: 8px; font-weight: 600; cursor: pointer;
+        }
+        .search button:hover { background: #1a365d; }
+        .search .clear { color: #2b6cb0; text-decoration: none; font-size: 0.9rem; }
+        .count { color: #718096; font-size: 0.85rem; margin-bottom: 14px; }
+        .empty { text-align: center; color: #718096; padding: 28px; }
     </style>
 </head>
 <body>
-<c:if test="${empty sessionScope.loggedInMember}">
-    <c:redirect url="login.jsp"/>
-</c:if>
-
 <header>
     <h1>LIBIS</h1>
     <div class="user-info">
         Signed in as <strong>${sessionScope.loggedInMember.fullName}</strong>
         &nbsp;|&nbsp;
-        <a class="logout" href="${pageContext.request.contextPath}/login.jsp">Sign out</a>
+        <a class="logout" href="${pageContext.request.contextPath}/logout">Sign out</a>
     </div>
 </header>
 
 <main>
     <h2>Book Catalogue</h2>
     <p class="subtitle">Welcome, ${sessionScope.loggedInMember.firstName}. Here are all titles currently held by the library.</p>
+
+    <form class="search" method="get" action="${pageContext.request.contextPath}/catalogue">
+        <input type="text" name="q" placeholder="Search by title, author or genre" value="<c:out value='${query}'/>">
+        <button type="submit">Search</button>
+        <c:if test="${not empty query}">
+            <a class="clear" href="${pageContext.request.contextPath}/catalogue">Clear</a>
+        </c:if>
+    </form>
+    <p class="count">Showing ${books.size()} of ${totalBooks} books<c:if test="${not empty query}"> for &ldquo;<c:out value="${query}"/>&rdquo;</c:if></p>
 
     <table>
         <thead>
@@ -99,11 +117,11 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="book" items="<%= LibraryData.getBooks() %>">
+        <c:forEach var="book" items="${books}">
             <tr>
-                <td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.genre}</td>
+                <td><c:out value="${book.title}"/></td>
+                <td><c:out value="${book.author}"/></td>
+                <td><c:out value="${book.genre}"/></td>
                 <td>
                     <c:choose>
                         <c:when test="${book.available}">
@@ -115,12 +133,14 @@
                     </c:choose>
                 </td>
                 <td class="actions">
-                    <a href="#">Search</a>
                     <a href="#">Borrow</a>
                     <a href="#">Reserve</a>
                 </td>
             </tr>
         </c:forEach>
+        <c:if test="${empty books}">
+            <tr><td colspan="5" class="empty">No books match your search.</td></tr>
+        </c:if>
         </tbody>
     </table>
 </main>
